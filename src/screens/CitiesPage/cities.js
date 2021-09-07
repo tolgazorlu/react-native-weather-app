@@ -1,111 +1,61 @@
-// Searching using Search Bar Filter in React Native List View
-// https://aboutreact.com/react-native-search-bar-filter-on-listview/
-
-// import React in our code
-import React, { useState, useEffect } from 'react';
-
-// import all the components we are going to use
-import { SafeAreaView, Text, StyleSheet, View, FlatList } from 'react-native';
-import { SearchBar } from 'react-native-elements';
+import React, {useState} from 'react';
+import { View, Text, StyleSheet, StatusBar, FlatList } from "react-native";
+import { Card, TextInput } from 'react-native-paper';
+import LinearGradient from 'react-native-linear-gradient'
 
 const Cities = () => {
-  const [search, setSearch] = useState('');
-  const [filteredDataSource, setFilteredDataSource] = useState([]);
-  const [masterDataSource, setMasterDataSource] = useState([]);
 
-  useEffect(() => {
-    fetch('https://jsonplaceholder.typicode.com/posts')
-      .then((response) => response.json())
-      .then((responseJson) => {
-        setFilteredDataSource(responseJson);
-        setMasterDataSource(responseJson);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, []);
-
-  const searchFilterFunction = (text) => {
-    // Check if searched text is not blank
-    if (text) {
-      // Inserted text is not blank
-      // Filter the masterDataSource
-      // Update FilteredDataSource
-      const newData = masterDataSource.filter(function (item) {
-        const itemData = item.title
-          ? item.title.toUpperCase()
-          : ''.toUpperCase();
-        const textData = text.toUpperCase();
-        return itemData.indexOf(textData) > -1;
-      });
-      setFilteredDataSource(newData);
-      setSearch(text);
-    } else {
-      // Inserted text is blank
-      // Update FilteredDataSource with masterDataSource
-      setFilteredDataSource(masterDataSource);
-      setSearch(text);
-    }
-  };
-
-  const ItemView = ({ item }) => {
-    return (
-      // Flat List Item
-      <Text style={styles.itemStyle} onPress={() => getItem(item)}>
-        {item.id}
-        {'.'}
-        {item.title.toUpperCase()}
-      </Text>
-    );
-  };
-
-  const ItemSeparatorView = () => {
-    return (
-      // Flat List Item Separator
-      <View
-        style={{
-          height: 0.5,
-          width: '100%',
-          backgroundColor: '#C8C8C8',
-        }}
-      />
-    );
-  };
-
-  const getItem = (item) => {
-    // Function for click on an item
-    alert('Id : ' + item.id + ' Title : ' + item.title);
-  };
+  const [city, setCity] = useState('');
+  const [cities, setCities] = useState([]);
+  const fetchCities = (text)=>{
+    setCity(text)
+    fetch("https://api.weather.com/v3/location/search?apiKey=6532d6454b8aa370768e63d6ba5a832e&language=en-US&query="+text+"&locationType=city&format=json")    
+    .then(item => item.json())
+    .then(cityData => {
+        setCities(cityData.location.address);
+        console.log(cityData.location);
+    })
+}
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View style={styles.container}>
-        <SearchBar
-          round
-          searchIcon={{ size: 24 }}
-          onChangeText={(text) => searchFilterFunction(text)}
-          onClear={(text) => searchFilterFunction('')}
-          placeholder="Type Here..."
-          value={search}
+    <LinearGradient colors={['#002855', '#023E7D', '#0353A4', '#0466C8']} style={{flex:1, padding: 20}}>
+        <StatusBar
+            backgroundColor="#002855"
+            translucent={false}
         />
-        <FlatList
-          data={filteredDataSource}
-          keyExtractor={(item, index) => index.toString()}
-          ItemSeparatorComponent={ItemSeparatorView}
-          renderItem={ItemView}
+        <TextInput 
+          label="Enter a city name"
+          right={<TextInput.Icon name="city" />}
+          value = {city}
+          style = {styles.searchBar}
+          onChangeText = {(text) => fetchCities(text)}
         />
-      </View>
-    </SafeAreaView>
-  );
-};
+        <FlatList 
+        data = {cities}
+        renderItem = {({item}) => {
+          return(
+            <Card style={styles.card}>
+                <Text>{item}</Text>
+            </Card>
+          )
+        }}
+        keyExtractor = {item => item}
+        />
+    </LinearGradient>
+)
+}
 
-const styles = StyleSheet.create({
-  container: {
+const styles=StyleSheet.create({
+  searchBar: {
     backgroundColor: 'white',
+    marginBottom: 5
   },
-  itemStyle: {
-    padding: 10,
-  },
-});
+  card: {
+    marginTop: 5,
+    marginBottom: 5,
+    padding: 12,
+    backgroundColor: 'white'
+  }
+})
 
-export default Cities;
+export default Cities
