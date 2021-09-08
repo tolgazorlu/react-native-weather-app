@@ -1,11 +1,14 @@
-import React from 'react';
-import { View, Text, Image, ScrollView, StatusBar } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, StatusBar } from 'react-native';
 import Main from '../components/weatherPageComponents/main';
 import Today from '../components/weatherPageComponents/today';
 import styles from './weatherStyle';
 import LinearGradient from 'react-native-linear-gradient';
 
+
+
 function Weather() {
+
     return (
         <LinearGradient colors={['#002855', '#023E7D', '#0353A4', '#0466C8']} style={styles.container}>
             <StatusBar

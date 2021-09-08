@@ -6,7 +6,7 @@ import Cities from './src/screens/CitiesPage/cities'
 const App = () => {
 
   return (
-    <Cities />
+    <Weather/>
   )
 
 }
